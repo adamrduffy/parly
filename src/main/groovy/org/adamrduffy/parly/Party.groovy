@@ -28,19 +28,11 @@ class Party {
         return partyQuota - Math.floor(partyQuota)
     }
 
-    float getVoteShareRemainder() {
-        return voteShare - Math.floor(voteShare)
-    }
-
     int getTotalSeats() {
         return getSeats() + getPrSeatsRoundDown() + remainderPrSeats
     }
 
     int getVotes() {
         return candidates.sum { it.votes } as int
-    }
-
-    boolean isElected(String candidateCode) {
-        return elected.find { e -> candidateCode.equalsIgnoreCase( e.code ) } != null
     }
 }
