@@ -14,7 +14,30 @@ class ParliamentArchDiagram {
                                  20323, 20888, 21468, 22050, 22645, 23243, 23853, 24467, 25094, 25723, 26364, 27011,
                                  27667, 28329, 29001, 29679, 30367, 31061]
 
-    static String generate(List<Parliamentarian> parliamentarians, int delegates, Map config = [:]) {
+    /**
+     * Returns an svg graph of the parliament arch diagram with seats assigned to delegates grouped by their parties.
+     * If the size of the list of parliamentarians is less than the total number of seats, the rest of the seats will be
+     * marked vacant - this may happen in the case where a by-election needs to be called.
+     *
+     * @param parliamentarians list of parliamentarians including their name, party and party colour
+     * @param delegates the total number of seats available in the parliament
+     * @param config a configuration map with the following possible values
+     * <ul>
+     *     <li>defaultPartyColour - rgb value for parties without a party colour, typically used for independents and smaller parties, defaults to #808080</li>
+     *     <li>width - width in px of svg, defaults to 360</li>
+     *     <li>height - height in px of svg, defaults to 185</li>
+     *     <li>vacantSeatFillColour - rgb value for the fill colour for vacant seats, e.g. seats awaiting by-elections, defaults to #FFFFFF</li>
+     *     <li>vacantSeatStrokeColour - rgb value for the stroke (circle edge) colour for vacant seats, defaults to #000000</li>
+     *     <li>labelPositionX - label position, defaults to 175</li>
+     *     <li>labelPositionY - label position, defaults to 175</li>
+     *     <li>labelStyle - css styling for label text, defaults to font-size:36px; font-weight:bold; text-align:center; text-anchor:middle; font-family:sans-serif</li>
+     *     <li>label - label to be displayed within the arch diagram, defaults to delegates parameter value, e.g. second parameter to method</li>
+     * </ul>
+     * @param seatLabel closure to determine the seat label that accepts a parliamentarian parameter
+     *
+     * @return string containing the svg markup
+     */
+    static String generate(List<Parliamentarian> parliamentarians, int delegates, Map config = [:], Closure<String> seatLabel) {
         String defaultPartyColour = config.get('defaultPartyColour', '#808080') as String
         int width = config.get('width', 360) as int
         int height = config.get('height', 185) as int
@@ -48,12 +71,11 @@ class ParliamentArchDiagram {
                     String partyColour = parliamentarians.findResult { parliamentarian -> party.equalsIgnoreCase(parliamentarian.party) ? parliamentarian.partyColour : null }
                     String fillColour = partyColour == null ? "$defaultPartyColour" : partyColour
                     List<Parliamentarian> parliamentariansInParty = parliamentarians.findAll { parliamentarian -> party.equalsIgnoreCase(parliamentarian.party) }
-                    List<String> parliamentarianNames = parliamentariansInParty.collect{ parliamentarian -> parliamentarian.name }
-                    generatePartySeatGroup(xml, party, parliamentarianNames, totalCounter, parliamentariansInParty.size(), radius, positionsList, fillColour, fillColour)
+                    generatePartySeatGroup(xml, party, parliamentariansInParty, totalCounter, parliamentariansInParty.size(), radius, positionsList, fillColour, fillColour, seatLabel)
                     totalCounter += parliamentariansInParty.size()
                 }
                 int vacantSeats = delegates - totalCounter
-                generatePartySeatGroup(xml, null, null, totalCounter, vacantSeats, radius, positionsList, "$vacantSeatFillColour", "$vacantSeatStrokeColour")
+                generatePartySeatGroup(xml, null, null, totalCounter, vacantSeats, radius, positionsList, "$vacantSeatFillColour", "$vacantSeatStrokeColour", seatLabel)
             }
         }
         return writer.toString()
@@ -86,21 +108,20 @@ class ParliamentArchDiagram {
         }
     }
 
-    private static void generatePartySeatGroup(MarkupBuilder xml, String party, List<String> parliamentarians,
-                                         int offset, int seats = parliamentarians.size(), double radius,
-                                         List positionList, String fillColour, String strokeColour) {
+    private static void generatePartySeatGroup(MarkupBuilder xml, String party, List<Parliamentarian> parliamentarians,
+                                               int offset, int seats = parliamentarians.size(), double radius,
+                                               List positionList, String fillColour, String strokeColour, Closure<String> seatLabel) {
         xml.g(id: "$party", style: "fill:$fillColour; stroke:$strokeColour; stroke-width: 2;") {
             for (int counter = offset; counter < offset + seats; counter++) {
                 def x = positionList[counter][1] * 100.0 + 5.0
                 def y = 100.0 * (1.75 - (positionList[counter][2] as double)) + 5.0
                 def r = radius * 100.0
 
-                def candidate = parliamentarians == null || parliamentarians.empty ?
+
+                Parliamentarian candidate = parliamentarians == null || parliamentarians.empty ?
                         null :
-                        parliamentarians[offset >= counter ? offset - counter : counter]
-                def name = party == null ? "Vacant" : "PR - $party"
-                def title = candidate == null ? name : "$candidate - $party"
-                generatePartySeat(xml, title, x, y, r)
+                        parliamentarians[counter - offset]
+                generatePartySeat(xml, seatLabel(candidate), x, y, r)
             }
         }
     }

@@ -17,6 +17,8 @@ class ParliamentArchDiagramTest {
         parliamentarians.add(new Parliamentarian("Dan", "DEF", "#009900"))
         parliamentarians.add(new Parliamentarian(null, "DEF", "#009900"))
         parliamentarians.add(new Parliamentarian("Frank", "GHI", "#66FF66"))
-        assertNotNull ParliamentArchDiagram.generate(parliamentarians, 16)
+
+        def seatLabel = { p -> p == null || p.party == null ? "Vacant" : (p.name == null ? "PR - $p.party" : "$p.name - $p.party") }
+        assertNotNull ParliamentArchDiagram.generate(parliamentarians, 16, [vacantSeatStrokeColour: '#808080'], seatLabel)
     }
 }
