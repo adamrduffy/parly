@@ -7,13 +7,12 @@ class Party {
     String code
     int votes
     List<Candidate> candidates = new ArrayList<>()
-    List<Candidate> elected = new ArrayList<>()
     float voteShare
     float partyQuota
     int remainderPrSeats
 
     int getSeats() {
-        return elected.size()
+        return candidates.count { candidate -> candidate.elected }
     }
 
     float getPrSeats() {
