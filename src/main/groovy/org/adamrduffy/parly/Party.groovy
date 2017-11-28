@@ -11,8 +11,12 @@ class Party {
     float partyQuota
     int remainderPrSeats
 
-    int getSeats() {
+    int getElected() {
         return candidates.count { candidate -> candidate.elected }
+    }
+
+    int getSeats() {
+        return candidates.count { candidate -> candidate.seated }
     }
 
     float getPrSeats() {

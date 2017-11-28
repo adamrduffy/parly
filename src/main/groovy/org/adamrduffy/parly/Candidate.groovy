@@ -10,4 +10,5 @@ class Candidate {
     int votes
     float share
     boolean elected
+    boolean seated
 }

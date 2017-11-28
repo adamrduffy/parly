@@ -43,6 +43,7 @@ class MixedMemberProportionalRepresentation {
         constituencies.each { constituency ->
             def candidateWithMostVotes = constituency.candidates.max { it.votes }
             candidateWithMostVotes.elected = true
+            candidateWithMostVotes.seated = !constituency.byelection
         }
     }
 
