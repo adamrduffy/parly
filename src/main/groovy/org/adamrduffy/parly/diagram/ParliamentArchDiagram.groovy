@@ -1,4 +1,4 @@
-package org.adamrduffy.parly
+package org.adamrduffy.parly.diagram
 
 import groovy.xml.MarkupBuilder
 

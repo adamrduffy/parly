@@ -3,8 +3,9 @@ package org.adamrduffy.parly
 import groovy.transform.Canonical
 
 @Canonical
-class Parliamentarian {
+class Constituency {
+    String code
     String name
-    String party
-    String partyColour
+    List<Candidate> candidates
+    boolean byelection
 }
