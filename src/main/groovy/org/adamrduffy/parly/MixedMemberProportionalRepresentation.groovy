@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 class MixedMemberProportionalRepresentation {
     private static final Logger LOGGER = LoggerFactory.getLogger(MixedMemberProportionalRepresentation.class)
 
-    static Seats calculateSeats(List<Party> parties, int byelections, int totalSeats) {
+    static Election calculateSeats(List<Party> parties, int byelections, int totalSeats) {
         int nationalTotalVotes = parties.sum { it.votes } as int
         float nationalQuota = nationalTotalVotes / (totalSeats - byelections)
         LOGGER.debug "$nationalTotalVotes $nationalQuota"
@@ -30,7 +30,7 @@ class MixedMemberProportionalRepresentation {
         parties.each { party ->
             LOGGER.debug "$party.code Seats: $party.totalSeats"
         }
-        return new Seats(parties: parties, nationalQuota: nationalQuota as float)
+        return new Election(parties: parties, nationalQuota: nationalQuota as float)
     }
 
     static Map<String, Party> determineParties(List<Constituency> constituencies) {

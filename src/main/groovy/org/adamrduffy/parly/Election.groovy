@@ -3,8 +3,9 @@ package org.adamrduffy.parly
 import groovy.transform.Canonical
 
 @Canonical
-class Seats {
+class Election {
     Date date
-    List<Party> parties
     float nationalQuota
+    int seats
+    List<Party> parties
 }
