@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'org.adamrduffy.parly'
-version = '1.1'
+version = '1.2'
 
 repositories {
     mavenLocal()
@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.12'
+    compile 'org.slf4j:slf4j-api:1.7.25'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

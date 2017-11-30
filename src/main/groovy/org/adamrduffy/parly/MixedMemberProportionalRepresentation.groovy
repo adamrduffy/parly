@@ -1,28 +1,34 @@
 package org.adamrduffy.parly
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+
 class MixedMemberProportionalRepresentation {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MixedMemberProportionalRepresentation.class)
+
     static Seats calculateSeats(List<Party> parties, int byelections, int totalSeats) {
         int nationalTotalVotes = parties.sum { it.votes } as int
         float nationalQuota = nationalTotalVotes / (totalSeats - byelections)
-        println "$nationalTotalVotes $nationalQuota"
+        LOGGER.debug "$nationalTotalVotes $nationalQuota"
         parties.sort(new PartyCodeComparator())
         parties.each { party ->
             party.partyQuota = party.votes / nationalQuota
             party.voteShare = (party.votes / nationalTotalVotes) * 100
-            println "$party.code Seats: $party.seats + $party.prSeatsRoundDown ($party.votes $party.partyQuota % $party.voteShare %)"
+            LOGGER.debug "$party.code Seats: $party.seats + $party.prSeatsRoundDown ($party.votes $party.partyQuota % $party.voteShare %)"
         }
         int seatsAllocated = parties.sum { it.getTotalSeats() } as int
-        println "Total Seats Allocated: $seatsAllocated"
+        LOGGER.debug "Total Seats Allocated: $seatsAllocated"
         int remaining = totalSeats - seatsAllocated - byelections
-        println "Allocating Remaining $remaining on Highest Remainder"
+        LOGGER.debug "Allocating Remaining $remaining on Highest Remainder"
         parties.sort(new PartyPrRemainderComparator())
         parties.take(remaining).each { party ->
-            println "$party.code PR Remainder $party.partyQuotaRemainder"
+            LOGGER.debug "$party.code PR Remainder $party.partyQuotaRemainder"
             party.remainderPrSeats += 1
         }
         parties.sort(new PartySeatComparator())
         parties.each { party ->
-            println "$party.code Seats: $party.totalSeats"
+            LOGGER.debug "$party.code Seats: $party.totalSeats"
         }
         return new Seats(parties: parties, nationalQuota: nationalQuota as float)
     }
